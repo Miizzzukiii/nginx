@@ -4,7 +4,7 @@ metadata:
   name: {{ .Values.metadata.name }}
   labels:
     app: {{ .Values.metadata.labels.app }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    chart: {{ Values.chart.name }}-{{ Values.chart.version }}
     environment: {{ .Values.metadata.environment }}
 spec:
   replicas: {{ .Values.replicaCount }}
@@ -29,17 +29,17 @@ spec:
               subPath: nginx.conf
           livenessProbe: 
             httpGet:
-              path: {{ .Values.livenessProbe.path }}
-              port: {{ .Values.service.app.port }}
+              path: {{ .Values.nginx.livenessProbe.path }}
+              port: {{ .Values.nginx.service.app.port }}
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
           readinessProbe: 
             httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          resources: # Ограничения ресурсов
+              path: {{ .Values.nginx.readinessProbe.path }}
+              port: {{ .Values.nginx.service.app.port }}
+            initialDelaySeconds: {{ .Values.readinessProbe.nginx.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.nginx.periodSeconds }}
+          resources: 
             limits:
               cpu: "500m"
               memory: "256Mi"
@@ -51,19 +51,19 @@ spec:
           imagePullPolicy: {{ .Values.exporter.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.exporter.port }}
-          livenessProbe: # Проверка живости экспортера
+          livenessProbe: 
             httpGet:
-              path: /metrics
-              port: {{ .Values.exporter.port }}
-            initialDelaySeconds: 10
-            periodSeconds: 15
-          readinessProbe: # Проверка готовности экспортера
+              path: {{ .Values.exporter.livenessProbe.path }}
+              port: {{ .Values.exporter.service.app.port }}
+            initialDelaySeconds: {{ .Values.exporter.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.exporter.readinessProbe.periodSeconds }}
+          readinessProbe: 
             httpGet:
-              path: /metrics
-              port: {{ .Values.exporter.port }}
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          resources: # Ограничения ресурсов для экспортера
+              path: {{ .Values.exporter.readinessProbe.path }}
+              port: {{ .Values.exporter.service.app.port }}
+            initialDelaySeconds: {{ .Values.exporter.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.exporter.readinessProbe.periodSeconds }}
+          resources: 
             limits:
               cpu: "200m"
               memory: "128Mi"
