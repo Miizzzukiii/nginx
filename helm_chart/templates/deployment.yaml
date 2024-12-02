@@ -22,7 +22,7 @@ spec:
           image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
           imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.nginx.port | default 80 }}  # Если не задать порт в переменной, то будет 80
+            - containerPort: {{ .Values.nginx.port | default 80 }}
           volumeMounts:
             - name: {{ .Values.nginx.config.volumeName }}
               mountPath: {{ .Values.nginx.config.mountPath }}
@@ -51,12 +51,16 @@ spec:
           imagePullPolicy: {{ .Values.exporter.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.exporter.port }}
+          volumeMounts:
+            - name: {{ .Values.exporter.config.volumeName }}
+              mountPath: {{ .Values.exporter.config.mountPath }}
+              subPath: {{ .Values.exporter.config.subPath }}
           livenessProbe: 
             httpGet:
               path: {{ .Values.exporter.livenessProbe.path }}
               port: {{ .Values.exporter.port }}
-            initialDelaySeconds: {{ .Values.exporter.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.exporter.readinessProbe.periodSeconds }}
+            initialDelaySeconds: {{ .Values.exporter.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.exporter.livenessProbe.periodSeconds }}
           readinessProbe: 
             httpGet:
               path: {{ .Values.exporter.readinessProbe.path }}
@@ -71,6 +75,9 @@ spec:
               cpu: {{ .Values.exporter.resources.requests.cpu }}
               memory: {{ .Values.exporter.resources.requests.memory }}
       volumes:
+        - name: {{ .Values.nginx.config.volumeName }}
+          configMap:
+            name: {{ .Values.nginx.config.configMapName }}
         - name: {{ .Values.exporter.config.volumeName }}
           configMap:
             name: {{ .Values.exporter.config.configMapName }}
@@ -79,7 +86,3 @@ spec:
     rollingUpdate:
       maxSurge: {{ .Values.DeploymentUpdate.maxSurge }}
       maxUnavailable: {{ .Values.DeploymentUpdate.maxUnavailable }}
-     
-
-
-
