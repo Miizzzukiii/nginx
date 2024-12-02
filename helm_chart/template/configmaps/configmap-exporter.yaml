@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: nginx-exporter-config
-data:
-  exporter.conf: |
-    scrape_interval: "15s"
-    status_url: "http://localhost:8080/nginx_status"
