@@ -2,12 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.metadata.name }}
-  environment: {{ .Values.metadata.environment }}
   labels:
     app: {{ .Values.metadata.labels.app }}
-    chart: {{ .Values.metadata.labels.chart }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     environment: {{ .Values.metadata.environment }}
-    
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -17,24 +15,71 @@ spec:
     metadata:
       labels:
         app: {{ .Values.metadata.labels.app }}
+        environment: {{ .Values.metadata.environment }}
     spec:
       containers:
         - name: nginx
           image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
           imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
           ports:
-            - containerPort:  {{ .Values.nginx.port }}
+            - containerPort: 80
           volumeMounts:
             - name: nginx-config-volume
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
+          livenessProbe: 
+            httpGet:
+              path: {{ .Values.livenessProbe.path }}
+              port: {{ .Values.service.app.port }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          readinessProbe: 
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources: # Ограничения ресурсов
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+            requests:
+              cpu: "250m"
+              memory: "128Mi"
         - name: nginx-exporter
           image: "{{ .Values.exporter.image.repository }}:{{ .Values.exporter.image.tag }}"
           imagePullPolicy: {{ .Values.exporter.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.exporter.port }}
+          livenessProbe: # Проверка живости экспортера
+            httpGet:
+              path: /metrics
+              port: {{ .Values.exporter.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe: # Проверка готовности экспортера
+            httpGet:
+              path: /metrics
+              port: {{ .Values.exporter.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources: # Ограничения ресурсов для экспортера
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
       volumes:
         - name: nginx-config-volume
           configMap:
             name: nginx-config
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.DeploymentUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.DeploymentUpdate.maxUnavailable }}
+     
+
+
 
