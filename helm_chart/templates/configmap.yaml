@@ -1,17 +1,20 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: #через values
-  labels:
-    app: {{ .Chart.Name }}
+  name: nginx-config
 data:
   nginx.conf: |
-    events {}
+    user nginx;
+    worker_processes auto;
+    events {
+      worker_connections 1024;
+    }
     http {
       server {
         listen 80;
         location / {
-          proxy_pass http://example.com;
+          root /usr/share/nginx/html;
+          index index.html;
         }
       }
     }
