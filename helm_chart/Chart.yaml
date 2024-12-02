@@ -4,3 +4,8 @@ name: nginx
 version: 0.1.0 #так как черновая версия 
 appVersion: "1.26.2" # Stable Версия Nginx, основная- 1.27.3 пишу так для ясности 
 # type: application у вас этого нет, так что писать не буду 
+# надо ли это?
+#keywords:
+#-monitoring
+#-alerting
+
