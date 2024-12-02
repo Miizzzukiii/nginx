@@ -22,7 +22,7 @@ spec:
           image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
           imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
           ports:
-            - containerPort: 80
+            - containerPort: {{ .Values.nginx.port | default 80 }}  # Если не задать порт в переменной, то будет 80
           volumeMounts:
             - name: {{ .Values.nginx.config.volumeName }}
               mountPath: {{ .Values.nginx.config.mountPath }}
