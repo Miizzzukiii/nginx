@@ -1,20 +1,51 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: nginx-config
+  name: {{ .Values.configMaps.nginx.name }}
 data:
   nginx.conf: |
-    user nginx;
-    worker_processes auto;
+    load_module modules/ngx_http_stub_status_module.so; #подключаем модуль для сбора базовых метрик
+
+    user nginx; #системный пользователь для nginx
+    worker_processes {{ .Values.nginx.workerProcesses | default "auto" }}; #автом опред кол-во процессов рабочих потоков исходя из CPU
+
     events {
-      worker_connections 1024;
+      worker_connections {{ .Values.nginx.workerConnections | default 1024 }}; #макс кол-во соед на 1 процесс
     }
+
     http {
+      upstream external_backend { #сюда будет направлен трафик от nginx
+        {{- if .Values.nginx.loadBalancingAlgorithm }}
+        {{ .Values.nginx.loadBalancingAlgorithm }};
+        {{- else }}
+        least_conn; #допустим
+        {{- end }}
+        
+        {{- range .Values.nginx.externalServers }}
+        server {{ . }};
+        {{- end }}
+      }
+
       server {
-        listen 80;
-        location / {
-          root /usr/share/nginx/html;
-          index index.html;
+        listen {{ .Values.nginx.listenPort | default 80 }};
+
+        location / {                          # "/" - обработать все запросы
+          proxy_pass http://external_backend; #запросы, приходящие на этот сервер, перенаправляются на upstream external_backend
+          proxy_set_header Host $host; #что передает? домен
+          proxy_set_header X-Real-IP $remote_addr;   #IP
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  #цепочку IP через кот прошел запрос
+          proxy_set_header X-Forwarded-Proto $scheme; #протокол, кот исп клиент 
+        }
+      }
+
+      server {
+        listen {{ .Values.nginx.statusPort | default 8080 }};
+        location /nginx_status {   #мониторинг с помощью модуля
+          stub_status; #активация модуля
+          {{- if .Values.nginx.statusAccess.allow }} 
+          allow {{ .Values.nginx.statusAccess.allow }}; # разрешает доступ определенным IP/подсетям
+          {{- end }}
+          deny all; #запрещает доступ всем остальным
         }
       }
     }
