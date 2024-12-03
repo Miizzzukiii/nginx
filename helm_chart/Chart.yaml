@@ -3,6 +3,7 @@ description: Helm Chart для Nginx + Nginx Prometheus Exporter
 name: nginx
 version: 0.1.0 #так как черновая версия 
 appVersion: "1.26.2" # Stable Версия Nginx, основная- 1.27.3 пишу так для ясности 
+# И ЕСЛИ 2 ПО В 1 чарте то что писать?
 # type: application у вас этого нет, так что писать не буду 
 # надо ли это?
 #keywords:
