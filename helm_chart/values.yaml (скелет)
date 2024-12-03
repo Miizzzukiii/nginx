@@ -1,0 +1,77 @@
+# Основные метаданные приложения
+metadata:
+  name: "nginx-deployment"
+  labels:
+    app: "nginx"
+    environment: "development"
+
+# Число реплик в деплойменте
+replicaCount: 2
+
+# Настройки для контейнера nginx
+nginx:
+  image:
+    repository: "nexus.ourdomain.com/my-nginx-repo/nginx"  # путь до образа в Nexus
+    tag: "..."  # посмотреть
+    pullPolicy: "Always"  # мб исправить 
+  port: 80
+  listenPort: 80
+  statusPort: 8080
+  workerProcesses: "auto"  # автоматическое определение числа рабочих процессов
+  workerConnections: 1024  # макс кол-во соединений на процесс
+  externalServers:
+    - "example.com"  # SMEV ENDPOINTS (сервера, на которые будет проксировать Nginx)
+    - "example.org"
+  loadBalancingAlgorithm: "least_conn"  
+  statusAccess:
+    allow: "192.168.0.0/24"  # узнать
+
+# Настройки для контейнера nginx-exporter
+exporter:
+  image:
+    repository: "nginx-exporter"  # аналогично все переписать 
+    tag: "..."  
+    pullPolicy: "IfNotPresent" 
+  port: 9113
+  scrapeInterval: "15s"  
+  statusUrl: "http://localhost:8080/nginx_status"  # URL для получения статуса Nginx
+  access:
+    allow: "0.0.0.0/0"  #настроить кому разрешено скрейпить
+
+# Настройки для сервисов
+services:
+  nginx:
+    name: "nginx-service"  
+    type: "ClusterIP" 
+  exporter:
+    name: "nginx-exporter-service"  
+    type: "ClusterIP"  
+
+# Настройки ConfigMap для nginx и экспортера
+configMaps:
+  nginx:
+    name: "nginx-config"  
+  exporter:
+    name: "nginx-exporter-config" 
+
+# Обновления деплоймента (rolling update)
+DeploymentUpdate:
+  maxSurge: "1"  # кол-во дополнительных подов, которые могут быть созданы при обновлении
+  maxUnavailable: "1"  # кол-во подов, которые могут быть недоступны во время обновления
+
+# Настройки livenessProbe и readinessProbe
+livenessProbe:
+  nginx:
+    initialDelaySeconds: 30  # Задержка перед первой проверкой для Nginx
+    periodSeconds: 10  # Период между проверками для Nginx
+  exporter:
+    initialDelaySeconds: 30  
+    periodSeconds: 10  
+    
+readinessProbe:
+  nginx:
+    initialDelaySeconds: 10  
+    periodSeconds: 5 
+  exporter:
+    initialDelaySeconds: 10  
+    periodSeconds: 5 
