@@ -84,5 +84,5 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: {{ .Values.DeploymentUpdate.maxSurge }}
-      maxUnavailable: {{ .Values.DeploymentUpdate.maxUnavailable }}
+      maxSurge: {{ .Values.DeploymentUpdate.maxSurge }} #кол-во доп подов кот можно поднять при обновлении (сверх указ кол-ва реплик)- числа или %
+      maxUnavailable: {{ .Values.DeploymentUpdate.maxUnavailable }} #кол-во подов кот могут быть недоступны во время обновления относительно изначального кол-ва реплик 
