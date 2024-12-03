@@ -14,78 +14,78 @@ nginx:
     repository: "nexus.ourdomain.com/my-nginx-repo/nginx"  # путь до образа в Nexus
     tag: "..." 
     pullPolicy: "Always"  
-  port: 80  # Порт для Nginx
-  listenPort: 80  # Порт для прослушивания
-  statusPort: 8080  # Порт для статуса
-  workerProcesses: "auto"  # автоматическое определение числа рабочих процессов
+  port: 80  # порт сервиса через который будет пробрас трафик в конт nginx
+  listenPort: 80  # порт конкретно для вход соед в nginx
+  statusPort: 8080  # порт на кот будет доступно получение статуса по nginx 
+  workerProcesses: "auto"  # автоматическое определение числа рабочих процессов по cpu
   workerConnections: 1024  # макс кол-во соединений на процесс
   externalServers:
-    - "example.com"  # Пример сервера для проксирования
-    - "example.org"  # Пример второго сервера
-  loadBalancingAlgorithm: "least_conn"  # Алгоритм балансировки нагрузки (least_conn, round_robin, etc.)
+    - "example.com"  # SMEV ENDPOINTS
+    - "example.org"  
+  loadBalancingAlgorithm: "least_conn"  
   statusAccess:
-    allow: "192.168.0.0/24"  # Разрешить доступ только для этой подсети
+    allow: "192.168.0.0/24"  # разрешить доступ только для этой подсети - переписать
 
   resources:
     requests:
-      cpu: "200m"  # Запросы на ресурсы CPU
-      memory: "256Mi"  # Запросы на ресурсы памяти
+      cpu: "200m"  #0.2 cpu переписать
+      memory: "256Mi"  
     limits:
-      cpu: "500m"  # Лимиты для CPU
-      memory: "512Mi"  # Лимиты для памяти
+      cpu: "500m"  
+      memory: "512Mi"  
 
   config:
-    volumeName: "nginx-config-volume"  # Имя тома
-    mountPath: "/etc/nginx"  # Путь монтирования
-    subPath: "nginx.conf"  # Подпуть конфигурации
-    configMapName: "nginx-config-map"  # Имя ConfigMap для конфигурации Nginx
+    volumeName: "nginx-config-volume"  
+    mountPath: "/etc/nginx"  
+    subPath: "nginx.conf"  # подпуть конфигурации
+    configMapName: "nginx-config-map"  
 
 # Настройки для контейнера nginx-exporter
 exporter:
   image:
-    repository: "nginx-exporter"  # Путь до образа nginx-exporter
-    tag: "latest"  # Тег образа
-    pullPolicy: "IfNotPresent"  # Политика загрузки образа
-  port: 9113  # Порт для экспорта метрик
-  scrapeInterval: "15s"  # Интервал для сбора метрик
+    repository: "nginx-exporter"  # аналогично переписать
+    tag: "latest" 
+    pullPolicy: "IfNotPresent"  
+  port: 9113  # порт для экспорта метрик
+  scrapeInterval: "15s" 
   statusUrl: "http://localhost:8080/nginx_status"  # URL для получения статуса Nginx
   access:
-    allow: "0.0.0.0/0"  # Разрешение на скрейпинг всех источников
+    allow: "0.0.0.0/0"  # разрешение на скрейпинг всех источников - переписать
 
   resources:
     requests:
-      cpu: "100m"  # Запросы на ресурсы CPU для nginx-exporter
-      memory: "128Mi"  # Запросы на ресурсы памяти для nginx-exporter
+      cpu: "100m"  
+      memory: "128Mi" 
     limits:
-      cpu: "200m"  # Лимиты для CPU nginx-exporter
-      memory: "256Mi"  # Лимиты для памяти nginx-exporter
+      cpu: "200m"  
+      memory: "256Mi"  
 
   config:
-    volumeName: "nginx-exporter-config-volume"  # Имя тома для конфигурации экспортера
-    mountPath: "/etc/nginx-exporter"  # Путь монтирования
-    subPath: "nginx-exporter.conf"  # Подпуть конфигурации экспортера
-    configMapName: "nginx-exporter-config-map"  # Имя ConfigMap для конфигурации экспортера
+    volumeName: "nginx-exporter-config-volume" 
+    mountPath: "/etc/nginx-exporter"  
+    subPath: "nginx-exporter.conf"  
+    configMapName: "nginx-exporter-config-map" 
 
 # Настройки для сервисов
 services:
   nginx:
-    name: "nginx-service"  # Имя сервиса для nginx
-    type: "ClusterIP"  # Тип сервиса (ClusterIP, NodePort, LoadBalancer)
-    port: 80  # Порт, на который будет проброшен сервис
-    targetPort: 80  # Порт контейнера, на который будет направлен трафик
+    name: "nginx-service" 
+    type: "ClusterIP"  
+    port: 80  # порт, на который будет проброшен сервис
+    targetPort: 80  # порт контейнера, на который будет направлен трафик
 
   exporter:
-    name: "nginx-exporter-service"  # Имя сервиса для nginx-exporter
-    type: "ClusterIP"  # Тип сервиса
-    port: 9113  # Порт, на который будет проброшен сервис
-    targetPort: 9113  # Порт контейнера, на который будет направлен трафик
+    name: "nginx-exporter-service"  
+    type: "ClusterIP"  
+    port: 9113  
+    targetPort: 9113  
 
 # Настройки ConfigMap для nginx и экспортера
 configMaps:
   nginx:
-    name: "nginx-config-map"  # Имя ConfigMap для конфигурации nginx
+    name: "nginx-config-map" 
   exporter:
-    name: "nginx-exporter-config-map"  # Имя ConfigMap
+    name: "nginx-exporter-config-map"  
 
 # Обновления деплоймента (rolling update)
 DeploymentUpdate:
@@ -95,23 +95,23 @@ DeploymentUpdate:
 # Настройки livenessProbe и readinessProbe
 livenessProbe:
   nginx:
-    path: "/healthz"  # Путь для liveness проверки для nginx
-    initialDelaySeconds: 30  # Задержка перед первой проверкой
-    periodSeconds: 10  # Период между проверками
+    path: "/healthz"  # путь для liveness проверки для nginx
+    initialDelaySeconds: 30  # задержка перед первой проверкой
+    periodSeconds: 10  # период между проверками
   exporter:
-    path: "/metrics"  # Путь для liveness проверки для exporter
-    initialDelaySeconds: 30  # Задержка перед первой проверкой
-    periodSeconds: 10  # Период между проверками
+    path: "/metrics"  
+    initialDelaySeconds: 30  
+    periodSeconds: 10 
 
 readinessProbe:
   nginx:
-    path: "/ready"  # Путь для readiness проверки для nginx
-    initialDelaySeconds: 10  # Задержка перед первой проверкой
-    periodSeconds: 5  # Период между проверками
+    path: "/ready"  
+    initialDelaySeconds: 10  
+    periodSeconds: 5  
   exporter:
-    path: "/metrics"  # Путь для readiness проверки для exporter
-    initialDelaySeconds: 10  # Задержка перед первой проверкой
-    periodSeconds: 5  # Период между проверками
+    path: "/metrics" 
+    initialDelaySeconds: 10  
+    periodSeconds: 5  
 
 # Дополнительные параметры
 
