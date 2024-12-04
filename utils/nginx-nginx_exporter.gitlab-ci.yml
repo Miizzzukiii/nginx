@@ -29,6 +29,10 @@ get_vars_from_vault:
     - export CI_ARTIFACTORY_W_LOGIN="$(vault kv get -field=login rec_public/prod/infra/artifactory/all_repos_write)"
     - export CI_ARTIFACTORY_W_PASSWORD="$(vault kv get -field=password rec_public/prod/infra/artifactory/all_repos_write)"
 
-
+deploy_to_develop:
+  stage: deploy
+  script:
+    - 
+    - 
 
 
