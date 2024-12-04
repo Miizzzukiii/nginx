@@ -40,6 +40,12 @@ data:
           proxy_set_header X-Forwarded-Proto $scheme; #протокол, кот исп клиент 
         }
       }
+        location /smev-adapter/nginx/api/v1/status { # Новый location для проверки доступности
+          access_log off; # отключаем логи запросов
+          return 200 'OK'; # возвращаем 200 OK
+          add_header Content-Type text/plain; # добавляем заголовок Content-Type
+        }
+      }
 
       server {
         listen {{ .Values.nginx.statusPort | default 8080 }};
