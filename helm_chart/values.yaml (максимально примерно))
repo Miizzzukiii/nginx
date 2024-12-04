@@ -1,9 +1,9 @@
 # Основные метаданные приложения
 metadata:
-  name: "nginx-deployment"
+  name: "smev-proxy-deployment"
   labels:
-    app: "nginx"
-    environment: "development"
+    app: "smev-proxy"
+    environment: "smev-proxy или все-таки devops-utils ? "
 
 # Число реплик в деплойменте
 replicaCount: 2
@@ -13,15 +13,14 @@ nginx:
   image:
     repository: "nexus.ourdomain.com/my-nginx-repo/nginx"  # путь до образа в Nexus
     tag: "..." 
-    pullPolicy: "Always"  
+    pullPolicy: "IfNotPresent"  
   port: 80  # порт сервиса через который будет пробрас трафик в конт nginx
   listenPort: 80  # порт конкретно для вход соед в nginx
   statusPort: 8080  # порт на кот будет доступно получение статуса по nginx 
   workerProcesses: "auto"  # автоматическое определение числа рабочих процессов по cpu
   workerConnections: 1024  # макс кол-во соединений на процесс
   externalServers:
-    - "example.com"  # SMEV ENDPOINTS
-    - "example.org"  
+    - " http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws "
   loadBalancingAlgorithm: "least_conn"  
   statusAccess:
     allow: "192.168.0.0/24"  # разрешить доступ только для этой подсети - переписать
@@ -113,6 +112,8 @@ readinessProbe:
     initialDelaySeconds: 10  
     periodSeconds: 5  
 
+restartPolicy: "OnFailure" 
+
 # Дополнительные параметры
 
 # Настройки для сетевых политик - потом 
@@ -125,15 +126,10 @@ networkPolicy:
     - to:
         - podSelector: {}  # Разрешить выход на все поды
 
-# Ретрай политики
-restartPolicy: "OnFailure"  # надо ли?
 
-# Таймауты нужны?
-timeouts:
-  createTimeout: "10m"  # время ожидания для создания ресурсов
-  updateTimeout: "5m"  # время ожидания для обновления ресурсов
 
-# Дополнительные параметры для подов нужны? affinity и тд?
+
+
 
 
 
