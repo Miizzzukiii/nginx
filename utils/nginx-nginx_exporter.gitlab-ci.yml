@@ -3,7 +3,7 @@ variables:
   CI_ARTIFACTORY_URL_CLOUD: $CI_ARTIFACTORY_URL_CLOUD
   CI_ARTIFACTORY_USER: $CI_ARTIFACTORY_USER
   CI_ARTIFACTORY_PASSWORD: $CI_ARTIFACTORY_PASSWORD
-  DOCKER_IMAGE: $CI_ARTIFACTORY_URL_CLOUD/utils/... #пока только nginx
+  DOCKER_IMAGE: $CI_ARTIFACTORY_URL_CLOUD/utils/nginx #пока только nginx
   JOB_NAME: nginx-exporter
   KUBECONFIG: /etc/deploy/config
   NAMESPACE: devops-utils
@@ -28,11 +28,29 @@ get_vars_from_vault:
     - export CI_ARTIFACTORY_PASSWORD="$(vault kv get -field=password rec_public/prod/infra/artifactory/all_repos_read)"
     - export CI_ARTIFACTORY_W_LOGIN="$(vault kv get -field=login rec_public/prod/infra/artifactory/all_repos_write)"
     - export CI_ARTIFACTORY_W_PASSWORD="$(vault kv get -field=password rec_public/prod/infra/artifactory/all_repos_write)"
+   reports:
+      dotenv: build.env
+    expire_in: 1 hour
 
 deploy_to_develop:
   stage: deploy
-  script:
-    - 
-    - 
+  when: manual
+  only:
+    - /^dev/.*$/ #какой-то человек подходил и сказал Диме, что надо создавать свою ветку сначала, а потом делать мердж в dev?
+  variables:
+    ENVIRONMENT: develop
+    CHART: cloud-dev #у Саши так было
+    DOCKER_IMAGE: $CI_ARTIFACTORY_URL_CLOUD/utils/nginx
+    NAMESPACE: $NAMESPACE-develop
+    PROJECT_NAME_APP: $CI_PROJECT_NAME
+    PROJECT_NAME_GROUP: $CI_PROJECT_NAMESPACE
+    PROJECT_NAME_ID: $CI_PROJECT_ID
+    PROJECT_NAMESPACE_ID: $CI_PROJECT_NAMESPACE_ID
+    PROJECT_NAME_BRANCH: $CI_COMMIT_BRANCH
+  trigger:
+    project: devops/ci-cd/deploy
+    branch: develop
+    strategy: depend
+
 
 
