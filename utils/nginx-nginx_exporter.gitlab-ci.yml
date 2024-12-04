@@ -33,7 +33,7 @@ deploy_to_develop:
     PROJECT_NAMESPACE_ID: $CI_PROJECT_NAMESPACE_ID
     PROJECT_NAME_BRANCH: $CI_COMMIT_BRANCH
   rules:
-    - if: '$CI_COMMIT_BRANCH =~ /^dev/.*$/' 
+    - if: '$CI_COMMIT_BRANCH == "develop" || $CI_MERGE_REQUEST_TARGET_BRANCH == "develop"' 
     - when: manual
   trigger:
     project: devops/ci-cd/deploy
