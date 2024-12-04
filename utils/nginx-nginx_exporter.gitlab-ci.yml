@@ -3,7 +3,7 @@ variables:
   CI_ARTIFACTORY_URL_CLOUD: $CI_ARTIFACTORY_URL_CLOUD
   CI_ARTIFACTORY_USER: $CI_ARTIFACTORY_USER
   CI_ARTIFACTORY_PASSWORD: $CI_ARTIFACTORY_PASSWORD
-  DOCKER_IMAGE: $CI_ARTIFACTORY_URL_CLOUD/utils/nginx #пока только nginx
+  DOCKER_IMAGE: $CI_ARTIFACTORY_URL_CLOUD/utils/nginx #тогда это тоже не нудно получается если я образ пушу сама
   JOB_NAME: nginx-exporter
   KUBECONFIG: /etc/deploy/config
   NAMESPACE: devops-utils
@@ -24,7 +24,7 @@ get_vars:
 deploy_to_develop:
   stage: deploy
   variables:
-    ENVIRONMENT: develop
+    ENVIRONMENT: dev
     CHART: cloud-dev #у Саши так было
     NAMESPACE: $NAMESPACE
     PROJECT_NAME_APP: $CI_PROJECT_NAME
