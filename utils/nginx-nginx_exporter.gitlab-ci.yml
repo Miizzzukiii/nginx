@@ -41,8 +41,7 @@ deploy_to_develop:
   variables:
     ENVIRONMENT: develop
     CHART: cloud-dev #у Саши так было
-    DOCKER_IMAGE: $CI_ARTIFACTORY_URL_CLOUD/utils/nginx
-    NAMESPACE: $NAMESPACE-develop
+    NAMESPACE: $NAMESPACE-dev
     PROJECT_NAME_APP: $CI_PROJECT_NAME
     PROJECT_NAME_GROUP: $CI_PROJECT_NAMESPACE
     PROJECT_NAME_ID: $CI_PROJECT_ID
