@@ -30,8 +30,10 @@ stages: тут надо писать стейцдж с волтом или не�
   export CI_ARTIFACTORY_W_LOGIN="$(vault kv get -field=login rec_public/prod/infra/artifactory/all_repos_write)"
   export CI_ARTIFACTORY_W_PASSWORD="$(vault kv get -field=password rec_public/prod/infra/artifactory/all_repos_write)"
 
-  
-
+stage: pull_image_from_local_registry
+script:
+  - docker pull localhost:5000/utils/nginx-exporter:latest
+  - docker login $CI_ARTIFACTORY_URL_CLOUD -u $CI_ARTIFACTORY_USER -p $CI_ARTIFACTORY_PASSWORD
   
 
 
