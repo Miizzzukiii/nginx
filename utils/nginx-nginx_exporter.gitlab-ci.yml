@@ -4,11 +4,11 @@ variables:
   CI_ARTIFACTORY_USER: $CI_ARTIFACTORY_USER
   CI_ARTIFACTORY_PASSWORD: $CI_ARTIFACTORY_PASSWORD
   DOCKER_IMAGE: $CI_ARTIFACTORY_URL_CLOUD/utils/nginx #тогда это тоже не нудно получается если я образ пушу сама
-  JOB_NAME: nginx-exporter
+  JOB_NAME: smev_proxy
   KUBECONFIG: /etc/deploy/config
   NAMESPACE: devops-utils
   VAULT_ADD: $CI_VAULT_ADD
-  CI_PROJECT_NAME: nginx-nginx_exporter
+  CI_PROJECT_NAME: smev_proxy
   CI_PROJECT_NAMESPACE: utils
   
 stages: 
