@@ -1,7 +1,3 @@
-include:
-  - project: 'devops/ci-cd/deploy'
-    ref: develop
-    
 variables:
   NAMESPACE: utils
   CI_ARTIFACTORY_URL_CLOUD: $CI_ARTIFACTORY_URL_CLOUD
