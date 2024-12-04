@@ -5,7 +5,6 @@ metadata:
     app: "smev-proxy"
     environment: "smev-proxy или все-таки devops-utils ? "
 
-# Число реплик в деплойменте
 replicaCount: 2
 
 # Настройки для контейнера nginx
@@ -24,7 +23,6 @@ nginx:
   loadBalancingAlgorithm: "least_conn"  
   statusAccess:
     allow: "192.168.0.0/24"  # разрешить доступ только для этой подсети - переписать
-
   resources:
     requests:
       cpu: "200m"  #0.2 cpu переписать
@@ -32,7 +30,6 @@ nginx:
     limits:
       cpu: "500m"  
       memory: "512Mi"  
-
   config:
     volumeName: "nginx-config-volume"  
     mountPath: "/etc/nginx"  
@@ -42,15 +39,14 @@ nginx:
 # Настройки для контейнера nginx-exporter
 exporter:
   image:
-    repository: "nginx-exporter"  # аналогично переписать
-    tag: "latest" 
+    repository: "path to image in nexus"  # аналогично переписать
+    tag: "..." 
     pullPolicy: "IfNotPresent"  
   port: 9113  # порт для экспорта метрик
   scrapeInterval: "15s" 
   statusUrl: "http://localhost:8080/nginx_status"  # URL для получения статуса Nginx
   access:
     allow: "0.0.0.0/0"  # разрешение на скрейпинг всех источников - переписать
-
   resources:
     requests:
       cpu: "100m"  
@@ -58,7 +54,6 @@ exporter:
     limits:
       cpu: "200m"  
       memory: "256Mi"  
-
   config:
     volumeName: "nginx-exporter-config-volume" 
     mountPath: "/etc/nginx-exporter"  
@@ -72,7 +67,6 @@ services:
     type: "ClusterIP"  
     port: 80  # порт, на который будет проброшен сервис
     targetPort: 80  # порт контейнера, на который будет направлен трафик
-
   exporter:
     name: "nginx-exporter-service"  
     type: "ClusterIP"  
@@ -94,37 +88,25 @@ DeploymentUpdate:
 # Настройки livenessProbe и readinessProbe
 livenessProbe:
   nginx:
-    path: "/healthz"  # путь для liveness проверки для nginx
+    path: "/smev-adapter/nginx/api/v1/status"  # в других хелмах /сервис/api/v1/status и путь для liveness readiness 1
     initialDelaySeconds: 30  # задержка перед первой проверкой
     periodSeconds: 10  # период между проверками
   exporter:
-    path: "/metrics"  
+    path: "/smev-adapter/nginx/api/v1/status"
     initialDelaySeconds: 30  
     periodSeconds: 10 
 
 readinessProbe:
   nginx:
-    path: "/ready"  
+    path: "/smev-adapter/exporter/api/v1/status" 
     initialDelaySeconds: 10  
     periodSeconds: 5  
   exporter:
-    path: "/metrics" 
+    path: "/smev-adapter/exporter/api/v1/status" 
     initialDelaySeconds: 10  
     periodSeconds: 5  
 
 restartPolicy: "OnFailure" 
-
-# Дополнительные параметры
-
-# Настройки для сетевых политик - потом 
-networkPolicy:
-  enabled: false  # Включить ли сетевую политику
-  ingress:
-    - from:
-        - podSelector: {}  # Разрешить доступ для всех подов в кластере
-  egress:
-    - to:
-        - podSelector: {}  # Разрешить выход на все поды
 
 
 
