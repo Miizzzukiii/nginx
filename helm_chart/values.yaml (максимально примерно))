@@ -7,7 +7,7 @@ metadata:
 
 replicaCount: 2
 
-# Настройки для контейнера nginx
+# Настройки для контейнера nginx 
 nginx:
   image:
     repository: "nexus.ourdomain.com/my-nginx-repo/nginx"  # путь до образа в Nexus
