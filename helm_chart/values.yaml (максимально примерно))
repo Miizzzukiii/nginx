@@ -10,7 +10,7 @@ replicaCount: 2
 # Настройки для контейнера nginx 
 nginx:
   image:
-    repository: "nexus.ourdomain.com/my-nginx-repo/nginx"  # путь до образа в Nexus
+    repository: "..."  # путь до образа ЛОКАЛЬНЫЙ какой можно поставить?
     tag: "..." 
     pullPolicy: "IfNotPresent"  
   port: 80  # порт сервиса через который будет пробрас трафик в конт nginx
@@ -22,7 +22,7 @@ nginx:
     - " http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws "
   loadBalancingAlgorithm: "least_conn"  
   statusAccess:
-    allow: "192.168.0.0/24"  # разрешить доступ только для этой подсети - переписать
+    allow: "192.168.0.0/24"  # разрешить доступ только для этой подсети - переписать пока ставить "0.0.0.0/0" -всем ?
   resources:
     requests:
       cpu: "200m"  #0.2 cpu переписать
@@ -39,7 +39,7 @@ nginx:
 # Настройки для контейнера nginx-exporter
 exporter:
   image:
-    repository: "path to image in nexus"  # аналогично переписать
+    repository: "path to image  ЛОКАЛЬНЫЙ"  # аналогично переписать
     tag: "..." 
     pullPolicy: "IfNotPresent"  
   port: 9113  # порт для экспорта метрик
