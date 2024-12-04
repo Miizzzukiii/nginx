@@ -15,22 +15,20 @@ stages:
 - init
 - deploy
 
+get_vars_from_vault:
+  stage: init
+  script:
+    - date
+    - echo "Setting Vault environment variables"
+    - export VAULT_SKIP_VERIFY=true
+    - export VAULT_ADDR=$CI_VAULT_ADD
+    - vault status
+    - export VAULT_TOKEN="$(vault write -field=token auth/jwt/login role=artifactory jwt=$CI_JOB_JWT)"
+    - export CI_ARTIFACTORY_USER="$(vault kv get -field=login rec_public/prod/infra/artifactory/all_repos_read)"
+    - export CI_ARTIFACTORY_PASSWORD="$(vault kv get -field=password rec_public/prod/infra/artifactory/all_repos_read)"
+    - export CI_ARTIFACTORY_W_LOGIN="$(vault kv get -field=login rec_public/prod/infra/artifactory/all_repos_write)"
+    - export CI_ARTIFACTORY_W_PASSWORD="$(vault kv get -field=password rec_public/prod/infra/artifactory/all_repos_write)"
 
-.get_variables_from_vault: &get_variables_from_vault | 
-  date
-  export VAULT_SKIP_VERIFY=true
-  export VAULT_ADDR=$CI_VAULT_ADD
-  vault status
-  export VAULT_TOKEN="$(vault write -field=token auth/jwt/login role=artifactory jwt=$CI_JOB_JWT)"
-  export CI_ARTIFACTORY_USER="$(vault kv get -field=login rec_public/prod/infra/artifactory/all_repos_read)"
-  export CI_ARTIFACTORY_PASSWORD="$(vault kv get -field=password rec_public/prod/infra/artifactory/all_repos_read)"
-  export CI_ARTIFACTORY_W_LOGIN="$(vault kv get -field=login rec_public/prod/infra/artifactory/all_repos_read)"
-  export CI_ARTIFACTORY_W_PASSWORD="$(vault kv get -field=password rec_public/prod/infra/artifactory/all_repos_read)"
 
-stage: pull_image_from_local_registry
-script:
-  - docker pull localhost:5000/utils/nginx-exporter:latest
-  - docker login $CI_ARTIFACTORY_URL_CLOUD -u $CI_ARTIFACTORY_USER -p $CI_ARTIFACTORY_PASSWORD
-  
 
 
