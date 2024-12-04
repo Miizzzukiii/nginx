@@ -15,26 +15,11 @@ stages:
 - init
 - deploy
 
-.get_variables_from_vault: &get_variables_from_vault
-  script:
-    - date
-    - echo "Setting Vault environment variables"
-    - export VAULT_SKIP_VERIFY=true
-    - export VAULT_ADDR=$CI_VAULT_ADD
-    - vault status
-    - export VAULT_TOKEN="$(vault write -field=token auth/jwt/login role=artifactory jwt=$CI_JOB_JWT)"
-    - export CI_ARTIFACTORY_USER="$(vault kv get -field=login rec_public/prod/infra/artifactory/all_repos_read)"
-    - export CI_ARTIFACTORY_PASSWORD="$(vault kv get -field=password rec_public/prod/infra/artifactory/all_repos_read)"
-    - export CI_ARTIFACTORY_W_LOGIN="$(vault kv get -field=login rec_public/prod/infra/artifactory/all_repos_write)"
-    - export CI_ARTIFACTORY_W_PASSWORD="$(vault kv get -field=password rec_public/prod/infra/artifactory/all_repos_write)"
+get_vars:
+  stage: init
   reports:
     dotenv: build.env  # Сохранение переменных окружения для следующего этапа
   expire_in: 1 hour
-
-get_vars_from_vault:
-  stage: init
-  script:
-    - *get_variables_from_vault
 
 deploy_to_develop:
   stage: deploy
@@ -48,7 +33,7 @@ deploy_to_develop:
     PROJECT_NAMESPACE_ID: $CI_PROJECT_NAMESPACE_ID
     PROJECT_NAME_BRANCH: $CI_COMMIT_BRANCH
   rules:
-    - if: '$CI_COMMIT_BRANCH =~ /^dev/.*$/'  #какой-то человек подходил и сказал Диме, что надо создавать свою ветку сначала, а потом делать мердж в dev?
+    - if: '$CI_COMMIT_BRANCH =~ /^dev/.*$/' 
     - when: manual
   trigger:
     project: devops/ci-cd/deploy
