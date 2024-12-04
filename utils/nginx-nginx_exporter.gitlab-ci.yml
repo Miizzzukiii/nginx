@@ -7,7 +7,7 @@ variables:
   CI_ARTIFACTORY_URL_CLOUD: $CI_ARTIFACTORY_URL_CLOUD
   CI_ARTIFACTORY_USER: $CI_ARTIFACTORY_USER
   CI_ARTIFACTORY_PASSWORD: $CI_ARTIFACTORY_PASSWORD
-  DOCKER_IMAGE: $CI_ARTIFACTORY_URL_CLOUD/utils/...
+  DOCKER_IMAGE: $CI_ARTIFACTORY_URL_CLOUD/utils/... #пока только nginx
   JOB_NAME: nginx-exporter
   KUBECONFIG: /etc/deploy/config
   NAMESPACE: devops-utils
@@ -15,9 +15,10 @@ variables:
   CI_PROJECT_NAME: nginx-nginx_exporter
   CI_PROJECT_NAMESPACE: utils
   
-stages: тут надо писать стейцдж с волтом или нет?
-- push_image_to_nexus
+stages: 
+- init
 - deploy
+
 
 .get_variables_from_vault: &get_variables_from_vault | 
   date
@@ -27,8 +28,8 @@ stages: тут надо писать стейцдж с волтом или не�
   export VAULT_TOKEN="$(vault write -field=token auth/jwt/login role=artifactory jwt=$CI_JOB_JWT)"
   export CI_ARTIFACTORY_USER="$(vault kv get -field=login rec_public/prod/infra/artifactory/all_repos_read)"
   export CI_ARTIFACTORY_PASSWORD="$(vault kv get -field=password rec_public/prod/infra/artifactory/all_repos_read)"
-  export CI_ARTIFACTORY_W_LOGIN="$(vault kv get -field=login rec_public/prod/infra/artifactory/all_repos_write)"
-  export CI_ARTIFACTORY_W_PASSWORD="$(vault kv get -field=password rec_public/prod/infra/artifactory/all_repos_write)"
+  export CI_ARTIFACTORY_W_LOGIN="$(vault kv get -field=login rec_public/prod/infra/artifactory/all_repos_read)"
+  export CI_ARTIFACTORY_W_PASSWORD="$(vault kv get -field=password rec_public/prod/infra/artifactory/all_repos_read)"
 
 stage: pull_image_from_local_registry
 script:
