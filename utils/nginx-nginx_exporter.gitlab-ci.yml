@@ -1,6 +1,5 @@
 include:
   - project: 'devops/ci-cd/deploy'
     ref: develop
-    file: '/ci/.gitlab-ci-nginx-nginx_exporter.yml'
 variables:
   NAMESPACE: utils
