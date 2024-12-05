@@ -10,22 +10,22 @@ replicaCount: 2
 # Настройки для контейнера nginx 
 nginx:
   image:
-    repository: "..."  # путь до образа ЛОКАЛЬНЫЙ какой можно поставить?
+    repository: "..."  # путь до образа в Nexus какой можно поставить?
     tag: "..." 
-    pullPolicy: "IfNotPresent"  
-  port: 80  # порт сервиса через который будет пробрас трафик в конт nginx
-  listenPort: 80  # порт конкретно для вход соед в nginx
+    pullPolicy: "Always"  
+  port: 8080  # порт сервиса через который будет пробрас трафик в конт nginx
+  listenPort: 8080  # порт конкретно для вход соед в nginx
   statusPort: 8080  # порт на кот будет доступно получение статуса по nginx 
   workerProcesses: "auto"  # автоматическое определение числа рабочих процессов по cpu
   workerConnections: 1024  # макс кол-во соединений на процесс
   externalServers:
-    - " http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws "
+    - "http://smev3-n0.test.gosuslugi.ru:7500/smev/v1.1/ws"
   loadBalancingAlgorithm: "least_conn"  
   statusAccess:
-    allow: "192.168.0.0/24"  # разрешить доступ только для этой подсети - переписать пока ставить "0.0.0.0/0" -всем ?
+    allow: "10.5.0.0/16"  # разрешить доступ только для паблик
   resources:
     requests:
-      cpu: "200m"  #0.2 cpu переписать
+      cpu: "200m"  #0.2 cpu переписать потом
       memory: "256Mi"  
     limits:
       cpu: "500m"  
@@ -46,7 +46,7 @@ exporter:
   scrapeInterval: "15s" 
   statusUrl: "http://localhost:8080/nginx_status"  # URL для получения статуса Nginx
   access:
-    allow: "0.0.0.0/0"  # разрешение на скрейпинг всех источников - переписать
+    allow: "10.5.0.0/16"  
   resources:
     requests:
       cpu: "100m"  
@@ -65,13 +65,13 @@ services:
   nginx:
     name: "nginx-service" 
     type: "ClusterIP"  
-    port: 80  # порт, на который будет проброшен сервис
-    targetPort: 80  # порт контейнера, на который будет направлен трафик
+    port: 8080  # порт, на который будет проброшен сервис
+    targetPort: 8080  # порт контейнера, на который будет направлен трафик
   exporter:
     name: "nginx-exporter-service"  
     type: "ClusterIP"  
-    port: 9113  
-    targetPort: 9113  
+    port: 8080 
+    targetPort: 8080  
 
 # Настройки ConfigMap для nginx и экспортера
 configMaps:
