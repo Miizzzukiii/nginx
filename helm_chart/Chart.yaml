@@ -5,4 +5,4 @@ version: 0.1.0 #так как черновая версия
 appVersion: "1.26.2" # Stable Версия Nginx
 # И ЕСЛИ 2 ПО В 1 чарте то что писать?
 
-
+https://gitlab.exportcenter.ru/devops/ci-cd/deploy/-/blob/master/helm/sub-service/transport-subsidy/templates/deployment.yaml
