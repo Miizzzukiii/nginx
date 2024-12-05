@@ -4,17 +4,15 @@ worker_processes  auto;
 error_log  /var/log/nginx/error.log notice;
 pid        /var/run/nginx.pid;
 
-
 events {
     worker_connections  1024;
 }
-
 
 http {
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
 
-    log_format  main  '$remote_addr - $remote_user [$time_local] "$reques>
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
 
@@ -28,4 +26,23 @@ http {
     #gzip  on;
 
     include /etc/nginx/conf.d/*.conf;
+
+    # Блок для использования stub_status
+    server {
+        listen 80;
+
+        # Настройка корневого каталога
+        location / {
+            root /usr/share/nginx/html;
+            index index.html;
+        }
+
+        # Блок для /nginx_status
+        location /nginx_status {
+            stub_status on;      # Включение модуля stub_status
+            access_log off;      # Отключаем логирование для этого пути
+            allow 127.0.0.1;     # Разрешаем доступ только с локального хоста
+            deny all;            # Запрещаем доступ с других IP
+        }
+    }
 }
