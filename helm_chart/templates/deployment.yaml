@@ -2,9 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.metadata.name }}
+  environment: {{ .Values.metadata.environment }}
   labels:
     app: {{ .Values.metadata.labels.app }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    developer: {{ .Values.metadata.labels.developer }}
     environment: {{ .Values.metadata.environment }}
 spec:
   replicas: {{ .Values.replicaCount }}
