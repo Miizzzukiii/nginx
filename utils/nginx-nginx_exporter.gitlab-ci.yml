@@ -39,5 +39,11 @@ deploy_to_develop:
     branch: develop
     strategy: depend
 
+cleanup:
+  stage: cleanup
+  script:
+    - helm uninstall my-release --namespace my-namespace
+  when: on_failure  # Удалить деплой, если он завершился с ошибкой
+
 
 
